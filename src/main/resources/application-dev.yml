@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/website?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8&allowMultiQueries=true
+
+
+
+logging:
+  level:
+    #整个项目的所有日志级别为info
+    root: info
+    #制定包的日志级别设置为trace
+    com.qh.twebsit: trace
+  #设置日志输出格式（年月日时分秒 表示线程名 日志级别 日志消息 换行）
+  pattern:
+    #yml文件中不能以%开始，所以需要在开头结尾加‘ ’
+    console: '%d{yyyy/mm/dd-HH:mm:ss} [%thread] %-5level %msg%n'
+
+  #设置日志输入路径 如果没有logback-spring.xml配置文件，系统只认识logging.file，不认识logging.path
+  path: G:/log
+  #设置日志默认文件名
+  file: demo.log
+
+mybatis-plus:
+  #config-location: jdbc-type-for-null: null
+  # 扫描resource下面mapper中的xml文件
+  mapper-locations: /mapper/*.xml
+  # 扫描实体类
+  type-aliases-package: com.qh.hwebsite.system.entity,com.qh.hwebsite.common.entity
+  # 关闭 mybatis-plus的 banner
+  global-config:
+    banner: false
+    # 配置逻辑删除设置
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
