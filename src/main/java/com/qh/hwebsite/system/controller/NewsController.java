@@ -11,6 +11,8 @@ import com.qh.hwebsite.system.entity.News;
 import com.qh.hwebsite.system.service.INewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -74,40 +76,29 @@ public class NewsController extends BaseController {
         return JSON.toJSONString(result);
     }
 
-    /**
-     * 新闻资讯详情
-     * @return
+    /*
+     * 新闻详情,上一条和下一条
      */
-    @RequestMapping("/detail")
-    public ModelAndView getDetail(News e){
-        ModelAndView mv=new ModelAndView();
-        News news=new News();
-        News preNew=new News();
-        News nextNew=new News();
-        List<News> list = newsService.list();
-        for (int i=0;i<list.size();i++) {
-            if(list.get(i).getId()==e.getId()){
-                if(i>=1){
-                    preNew=list.get(i-1);
-                }
-                news=list.get(i);
-                if(i<list.size()-1){
-                    nextNew=list.get(i+1);
-                }
-                break;
-            }
-        }
-        if(preNew.getId()!=null){
-            news.setPreid(preNew.getId());
-            news.setPrename(preNew.getTitle());
-        }
-        if(nextNew.getId()!=null){
+    @GetMapping("/detail")
+    public String getDetail(Long id, Model model){
+        News news = newsService.getById(id);
+        QueryWrapper<News> queryPre=new QueryWrapper<>();
+        queryPre.gt("id",id).last("limit 1");
+        News preNew=newsService.getOne(queryPre);
+        QueryWrapper<News> queryNext=new QueryWrapper<>();
+        queryNext.lt("id",id).orderByDesc("id").last("limit 1");
+        News nextNew = newsService.getOne(queryNext);
+        if(nextNew!=null){
             news.setNextid(nextNew.getId());
             news.setNextname(nextNew.getTitle());
         }
-        mv.addObject("news",news);
-        mv.setViewName(news_detail);
-        return mv;
+        if(preNew!=null){
+            news.setPreid(preNew.getId());
+            news.setPrename(preNew.getTitle());
+        }
+        model.addAttribute("title", news.getTitle());
+        model.addAttribute("news", news);
+        return news_detail;
     }
 
     /**
